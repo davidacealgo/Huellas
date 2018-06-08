@@ -11,7 +11,7 @@
 ----------Medellin 2018-----------------------------------------------------------------------
 """
 """
-----------1. Inicialización del sistema e inserción de librerias---------------------------------"""
+----------1. Inicializacion del sistema e insercion de librerias---------------------------------"""
 import cv2
 import os
 import web
@@ -22,28 +22,14 @@ from flask import Flask, render_template, request
 from flask.ext.uploads import UploadSet, configure_uploads, IMAGES
 from skimage.morphology import skeletonize, thin
 from FingerPrintFunctions import fingerBW, fingerMask
-os.chdir("/") #Definición de la ruta master
+os.chdir("/") #Definicion de la ruta master
 
-"""Subir las fotos por medio de FLask"""
-app = Flask(__name__)
-
-    photos = UploadSet('photos', IMAGES)
-    
-    app.config['UPLOADED_PHOTOS_DEST'] = 'static/img'
-    configure_uploads(app, photos)
-
-    @app.route('/upload', methods=['GET', 'POST'])
-    def upload():
-        if request.method == 'POST' and 'photo' in request.files:
-            filename = photos.save(request.files['photo'])
-            return filename
-        return render_template('upload.html')
 """--------------------------------------------------------------------------------------------
 ----------2. Remover puntos de la imagen (Ruido)-----------------------------------------------
 --------------------------------------------------------------------------------------------"""
 
 def removedot(invertThin):
-    temp0 = numpy.array(invertThin[:])   #Creación de variables
+    temp0 = numpy.array(invertThin[:])   #Creacion de variables
     temp0 = numpy.array(temp0)
     temp1 = temp0/255
     temp2 = numpy.array(temp1)
@@ -51,8 +37,8 @@ def removedot(invertThin):
     enhanced_img = numpy.array(temp0)   #Arreglo de la imagen
     filter0 = numpy.zeros((10,10))
     W,H = temp0.shape[:2]
-    filtersize = 6 #Número maximo de pixeles
-    for i in range(W - filtersize):  #Eliminación de islas de pixeles #Ciclos de recorrido de la imagen
+    filtersize = 6 #Numero maximo de pixeles
+    for i in range(W - filtersize):  #Eliminacion de islas de pixeles #Ciclos de recorrido de la imagen
         for j in range(H - filtersize):
             filter0 = temp1[i:i + filtersize,j:j + filtersize]
             flag = 0
@@ -71,7 +57,7 @@ def removedot(invertThin):
 
 
 """--------------------------------------------------------------------------------------------
-----------3. Extracción de minucias -----------------------------------------------------------
+----------3. Extraccion de minucias -----------------------------------------------------------
 --------------------------------------------------------------------------------------------"""
 def get_descriptors(img):#Descriptor de la huellas dactilares.
     img = fingerMask(img)#Se envia imagen de la huella, retorna la huella sin fondo y en Gray.
@@ -100,19 +86,26 @@ def get_descriptors(img):#Descriptor de la huellas dactilares.
     _, des = orb.compute(img, keypoints)
     return (keypoints, des)
 
+def imagematch(match):
+    if match=="1":
+        return True
+    elif match=="0":
+        return False 
+
+
 """--------------------------------------------------------------------------------------------
 ----------4. Codigo Principal -----------------------------------------------------------------
 --------------------------------------------------------------------------------------------"""
 def main():
 	#Lectura de la primera imagen
-    img1 = cv2.imread("/home/lis/Downloads/Archivos_python/python-fingerprint-recognition-master/database/huella2.jpg", 3)
+    img1 = cv2.imread("/home/estudiantes/davida.acevedo/Documents/Archivos python/python-fingerprint-recognition-master/database/101_1.tif", 3)
 	#Se aplica un resize para mejorar el tiempo de computo
     img1 = cv2.resize(img1, (0,0), fx=0.5, fy=0.5)
 	#Descriptor de la primera imagen
     kp1, des1 = get_descriptors(img1)
 
     #Lectura de la segunda imagen
-    img2 = cv2.imread("/home/lis/Downloads/Archivos_python/python-fingerprint-recognition-master/database/huella2.jpg", 3)
+    img2 = cv2.imread("static/img", 3)
 	#Se aplica un resize para mejorar el tiempo de computo
     img2 = cv2.resize(img2, (0,0), fx=0.5, fy=0.5)
 	#Descriptor de la segunda imagen
@@ -122,7 +115,7 @@ def main():
     # Matching entre descriptores
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
     matches = sorted(bf.match(des1, des2), key= lambda match:match.distance)
-    #Mostrar ibujar puntos clave en las dos imagenes 
+    #Mostrar dibujar puntos clave en las dos imagenes 
     img4 = cv2.drawKeypoints(img1, kp1, outImage=None)
     img5 = cv2.drawKeypoints(img2, kp2, outImage=None)
     f, axarr = plt.subplots(1,2)
@@ -132,7 +125,7 @@ def main():
     #Mostrar Matches
     img3 = cv2.drawMatches(img1, kp1, img2, kp2, matches, flags=2, outImg=None)
     plt.imshow(img3)
-    plt.show()
+    plt.savefig('img3.png')
 
     #Calcular puntaje
     score = 0
@@ -140,13 +133,12 @@ def main():
         score += match.distance
     score_threshold = 33
     if score/len(matches) < score_threshold:
-        print("Coinciden.")
+        imagematch=0
     else:
-        print("NO coinciden")
-	
-    
-    
+        imagematch=1
 
+    imagematch(imagematch)
+	
 	
 if __name__ == "__main__":
 	try:

@@ -77,18 +77,18 @@ def fingerBW(image):#Funcion para binarizaqr imagen con Thresh adaptativo
 #            done = True
     return img_bw
 #-----------------------------------------------------------------------------#     
-img_name = '../Huellas/huella2.jpg'#Ruta de la huella  
-img = cv2.imread(img_name,3)#Leyendo la huella
+#img_name = '../Huellas/huella2.jpg'#Ruta de la huella  
+#img = cv2.imread(img_name,3)#Leyendo la huella
 #img = cv2.resize(img, (0,0), fx=0.5, fy=0.5) 
-img_return = fingerMask(img)#Imagen enmascarada
-img_bw = fingerBW(img_return)#Skelton Imagen
+#img_return = fingerMask(img)#Imagen enmascarada
+#img_bw = fingerBW(img_return)#Skelton Imagen
 #filters = build_filters()#Construir filtro Gabor 
 #res1 = process(img_return, filters)#Aplicar filtro Gabor
 #img_bw = fingerBW(res1)
 #-----------------------------------------------------------------------------#
 #Mostrar resultados.
-plt.imshow(img_return, cmap='gray')
-plt.show()
+#plt.imshow(img_return, cmap='gray')
+#plt.show()
 #-----------------------------------------------------------------------------#
 #cv2.imshow('image',cv2.resize(img_bw, (0, 0), None, .2, .2))
 #cv2.imshow('image1',cv2.resize(img_return, (0, 0), None, .2, .2))
